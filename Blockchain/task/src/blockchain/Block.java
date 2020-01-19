@@ -11,61 +11,27 @@ class Block implements Serializable {
     String hash;
     String prevHash;
     Block prevBlock;
-    private String magicNumber;
+    long magicNumber;
     private long timeStamp;
-    private long generationTime;
+    long generationTime;
+    private int minerId;
+    String difficultyChangeMessage;
 
-    Block(int numOfLeadingZeros, Block prevBlock) {
+    Block(Block prevBlock, long magicNumber, long generationTime, int minerId) {
         timeStamp = new Date().getTime();
         this.prevBlock = prevBlock;
         id = prevBlock == null ? 1 : prevBlock.id + 1;
         prevHash = prevBlock == null ? "0" : prevBlock.hash;
-
-        //gen new hash
-        Instant start = Instant.now();
-        magicNumber = findMagicNumber(numOfLeadingZeros);
-        hash = Hash.applySha256(magicNumber + timeStamp + prevHash);
-        Instant end = Instant.now();
-
-
-        Duration timeElapsed = Duration.between(start, end);
-        generationTime = timeElapsed.toSeconds();
-
-    }
-
-    private String findMagicNumber(int numOfZeros) {
-        String hash;
-        String startHash = createRequiredStringPrefix(numOfZeros);
-        long magicNumber = generateNewMagicNumber();
-        String magicNumberStr;
-        do {
-            magicNumber++;
-            magicNumberStr = Long.toString(magicNumber);
-            hash = Hash.applySha256(magicNumberStr + timeStamp + prevHash);
-        } while (!hash.substring(0, numOfZeros).equals(startHash));
-        return magicNumberStr;
-    }
-
-    private static String createRequiredStringPrefix(int numOfZeros) {
-        StringBuilder str = new StringBuilder();
-        while (str.length() < numOfZeros) {
-            str.append("0");
-        }
-        return str.toString();
-    }
-
-    private static long generateNewMagicNumber() {
-        Random generator = new Random();
-        long magicNumber = generator.nextLong();
-        while (magicNumber < 0 || magicNumber > Long.MAX_VALUE / 2) {
-            magicNumber = generator.nextLong();
-        }
-        return magicNumber;
+        this.magicNumber = magicNumber;
+        this.generationTime = generationTime;
+        this.minerId = minerId;
+        this.hash = HashUtils.createBlockHash(magicNumber, prevHash);
     }
 
     void print() {
         System.out.println();
         System.out.println("Block:");
+        System.out.println("Created by miner # " + minerId);
         System.out.println("Id: " + id);
         System.out.println("Timestamp: " + timeStamp);
         System.out.println("Magic number: " + magicNumber);
@@ -74,5 +40,6 @@ class Block implements Serializable {
         System.out.println("Hash of the block:");
         System.out.println(hash);
         System.out.println("Block was generating for " + generationTime + " seconds");
+        System.out.println(difficultyChangeMessage);
     }
 }

@@ -3,9 +3,15 @@ package blockchain;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-public class Hash {
+class HashUtils {
+
+    static String createBlockHash(long magicNumber, String prevHash) {
+        String magicNumberStr = Long.toString(magicNumber);
+        return applySha256(magicNumberStr + prevHash);
+    }
+
     /* Applies Sha256 to a string and returns a hash. */
-    static String applySha256(String input){
+    private static String applySha256(String input){
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             /* Applies sha256 to our input */
@@ -21,5 +27,9 @@ public class Hash {
         catch(Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static boolean isValidHash(String hash, String hashPrefix) {
+        return hash.substring(0, hashPrefix.length()).equals(hashPrefix);
     }
 }

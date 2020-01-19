@@ -5,6 +5,9 @@ package blockchain;
 //import java.nio.file.Path;
 //import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -17,20 +20,7 @@ public class Main {
         return (Blockchain) obj;
     }*/
 
-    private static int getNumOfLeadingZeros() {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            try (scanner) {
-                System.out.println("Enter how many zeros the hash must starts with: ");
-                return scanner.nextInt();
-            } catch (Exception e) {
-                System.out.print("Only numbers are allowed");
-                scanner.nextLine();
-            }
-        }
-    }
-
-    public static void main(String[] args) /*throws IOException, ClassNotFoundException*/ {
+    public static void main(String[] args) throws InterruptedException /*throws IOException, ClassNotFoundException*/ {
         /*Path path = Paths.get("./blockchain.ser");
         boolean blockchainAlreadyExists = Files.exists(path);
         Blockchain blockchain;
@@ -41,18 +31,14 @@ public class Main {
                 return;
             }
         } else {*/
-        Blockchain blockchain = new Blockchain(getNumOfLeadingZeros());
+        //Blockchain blockchain = Blockchain.getInstance();
         //}
-        for (int i = 0; i < 5; i++) {
-            blockchain.addNewBlock();
+        Blockchain blockchain = Blockchain.getInstance();
+        ExecutorService executor = Executors.newFixedThreadPool(9);
+        for (int i = 1; i < 10; i++) {
+            executor.submit(new Miner(blockchain, i));
         }
-        if (blockchain.validate()) {
-            blockchain.print();
-        } else {
-            System.out.print("Blockchain invalid");
-        }
-
-
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
 }
-
