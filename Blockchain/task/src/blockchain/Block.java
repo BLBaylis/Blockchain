@@ -1,10 +1,8 @@
 package blockchain;
 
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
-import java.util.Random;
+import java.util.List;
 
 class Block implements Serializable {
     int id;
@@ -16,8 +14,10 @@ class Block implements Serializable {
     long generationTime;
     private int minerId;
     String difficultyChangeMessage;
+    private List<Message> messages;
 
-    Block(Block prevBlock, long magicNumber, long generationTime, int minerId) {
+    Block(List<Message> messages, Block prevBlock, long magicNumber, long generationTime, int minerId) {
+        this.messages = messages;
         timeStamp = new Date().getTime();
         this.prevBlock = prevBlock;
         id = prevBlock == null ? 1 : prevBlock.id + 1;
@@ -39,6 +39,12 @@ class Block implements Serializable {
         System.out.println(prevHash);
         System.out.println("Hash of the block:");
         System.out.println(hash);
+        System.out.println("Block data:");
+        if (messages == null) {
+            System.out.println("No messages");
+        } else {
+            messages.stream().map(Message::toString).forEach(System.out::println);
+        }
         System.out.println("Block was generating for " + generationTime + " seconds");
         System.out.println(difficultyChangeMessage);
     }

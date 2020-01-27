@@ -4,7 +4,9 @@ package blockchain;
 import com.sun.nio.sctp.AbstractNotificationHandler;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 class Blockchain /*implements Serializable*/ {
     //private static final long serialVersionUID = 1L;
@@ -12,6 +14,7 @@ class Blockchain /*implements Serializable*/ {
     private volatile Block latestBlock;
     private volatile int size;
     private int numOfLeadingZeros = 0;
+    private List<Message> messagesForNextBlock = new ArrayList<>(20);
 
     private Blockchain() { }
 
@@ -34,6 +37,10 @@ class Blockchain /*implements Serializable*/ {
         oos.writeObject(this);
         oos.close();
     }*/
+
+    synchronized void message(Message message) {
+        messagesForNextBlock.add(message);
+    }
 
     boolean validate() {
         Block currBlock = latestBlock;
