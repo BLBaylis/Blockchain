@@ -1,48 +1,45 @@
 package blockchain;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.util.List;
 import java.util.Random;
 
 public class Miner extends Thread {
     private Blockchain blockchain;
     private Block latestBlock;
+    private List<Message> blockData;
     private int id;
 
-    Miner(Blockchain blockchain, int id) {
-        this.blockchain = blockchain;
-        latestBlock = blockchain.getLatestBlock();
+    Miner(int id) {
+        this.blockchain = Blockchain.getInstance();
         this.id = id;
     }
 
     @Override
     public void run() {
-        String hashPrefix = blockchain.createHashPrefix();
-        while (blockchain.getSize() < 5) {
-            Instant start = Instant.now();
+        int targetBlockchainSize = blockchain.getTargetBlockchainSize();
+        String hashPrefix = HashUtils.createHashPrefix(blockchain.getNumOfLeadingZeros());
+        while (blockchain.getSize() < targetBlockchainSize) {
             long nonce = generateNonce();
             long magicNumber = findMagicNumber(nonce, hashPrefix);
-            Instant end = Instant.now();
-            Duration timeElapsed = Duration.between(start, end);
-            long generationTime = timeElapsed.toSeconds();
-            publishBlock(magicNumber, generationTime);
+            if (latestBlock != blockchain.getLatestBlock()) {
+                continue;
+            }
+            blockchain.submit(magicNumber, id);
         }
     }
 
-    private void publishBlock(long magicNumber, long generationTime) {
-        if (latestBlock != blockchain.getLatestBlock()) {
-            return;
-        }
-        blockchain.addNewBlock(new Block(latestBlock, magicNumber, generationTime, id));
+    private void refresh() {
+        latestBlock = blockchain.getLatestBlock();
+        blockData = blockchain.getPrevMessages();
     }
 
     private long findMagicNumber(long nonce, String hashPrefix) {
         long magicNumber = nonce;
-        while (blockchain.getSize() < 5) {
+        while (true) {
             magicNumber++;
-            latestBlock = blockchain.getLatestBlock();
+            refresh();
             String prevHash = latestBlock == null ? "0" : latestBlock.hash;
-            String hash = HashUtils.createBlockHash(magicNumber, prevHash);
+            String hash = HashUtils.createBlockHash(magicNumber, prevHash, blockData);
             if (latestBlock != blockchain.getLatestBlock()) {
                 continue;
             }

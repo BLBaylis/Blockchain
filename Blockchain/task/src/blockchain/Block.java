@@ -9,23 +9,31 @@ class Block implements Serializable {
     String hash;
     String prevHash;
     Block prevBlock;
-    long magicNumber;
+    private long magicNumber;
     private long timeStamp;
-    long generationTime;
+    private Long generationTime;
     private int minerId;
-    String difficultyChangeMessage;
+    private String difficultyChangeMessage;
     private List<Message> messages;
 
-    Block(List<Message> messages, Block prevBlock, long magicNumber, long generationTime, int minerId) {
-        this.messages = messages;
+    Block(Block prevBlock,
+          long magicNumber,
+          String hash,
+          int minerId,
+          List<Message> messages,
+          long generationTime,
+          String difficultyChangeMessage
+    ) {
         timeStamp = new Date().getTime();
         this.prevBlock = prevBlock;
         id = prevBlock == null ? 1 : prevBlock.id + 1;
         prevHash = prevBlock == null ? "0" : prevBlock.hash;
         this.magicNumber = magicNumber;
-        this.generationTime = generationTime;
         this.minerId = minerId;
-        this.hash = HashUtils.createBlockHash(magicNumber, prevHash);
+        this.messages = messages;
+        this.hash = hash;
+        this.generationTime = generationTime;
+        this.difficultyChangeMessage = difficultyChangeMessage;
     }
 
     void print() {
@@ -40,12 +48,12 @@ class Block implements Serializable {
         System.out.println("Hash of the block:");
         System.out.println(hash);
         System.out.println("Block data:");
-        if (messages == null) {
+        if (messages == null || messages.isEmpty()) {
             System.out.println("No messages");
         } else {
             messages.stream().map(Message::toString).forEach(System.out::println);
         }
-        System.out.println("Block was generating for " + generationTime + " seconds");
+        System.out.println("Block was generating for " + generationTime + " milliseconds");
         System.out.println(difficultyChangeMessage);
     }
 }
