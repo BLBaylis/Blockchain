@@ -8,12 +8,13 @@ import java.util.Deque;
 import java.util.List;
 
 class Blockchain {
+    //TODO: validate messages
     private final static Blockchain instance = new Blockchain();
     private final int targetBlockchainSize = 5;
     private final long targetGenerationTime = 10000;
     private volatile Block latestBlock;
     private int size;
-    private int numOfLeadingZeros = 0;
+    private int numOfLeadingZeros = 1;
     private Instant blockCreationTimerStart = Instant.now();
     private List<Message> prevMessages;
     private List<Message> newMessages = new ArrayList<>();
@@ -117,6 +118,7 @@ class Blockchain {
             Block blockToPrint = queue.removeFirst();
             blockToPrint.print();
         }
+        latestBlock.print();
     }
 
     enum DifficultyChange {

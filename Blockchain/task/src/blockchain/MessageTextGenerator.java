@@ -2,14 +2,7 @@ package blockchain;
 
 import java.util.Random;
 
-class MessageGenerator {
-    private static String[] users = {
-            "Brad",
-            "Gill",
-            "Trev",
-            "Sam",
-            "Jazz"
-    };
+class MessageTextGenerator {
 
     private static String[] messages = {
             "The fox in the top hat whispered into the ear of the rabbit",
@@ -34,10 +27,8 @@ class MessageGenerator {
             "There are few things better in life than a slice of pie",
     };
 
-    static Message generateRandomMessage() {
+    static String getRandomMessageText() {
         Random random = new Random();
-        int userIndex = random.nextInt(5);
-        int messageIndex = random.nextInt(19);
-        return new Message(users[userIndex], messages[messageIndex]);
+        return messages[random.nextInt(messages.length)];
     }
 }
