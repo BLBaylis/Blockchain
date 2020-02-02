@@ -1,5 +1,7 @@
 package blockchain;
 
+import java.security.PublicKey;
+import java.security.Signature;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayDeque;
@@ -8,13 +10,14 @@ import java.util.Deque;
 import java.util.List;
 
 class Blockchain {
-    //TODO: validate messages
     private final static Blockchain instance = new Blockchain();
+    private final long targetGenerationTime = 1000;
+    private int messageId = 0;
     private final int targetBlockchainSize = 5;
-    private final long targetGenerationTime = 10000;
+    private int userId = 0;
     private volatile Block latestBlock;
     private int size;
-    private int numOfLeadingZeros = 1;
+    private int numOfLeadingZeros = 0;
     private Instant blockCreationTimerStart = Instant.now();
     private List<Message> prevMessages;
     private List<Message> newMessages = new ArrayList<>();
@@ -23,6 +26,24 @@ class Blockchain {
 
     static Blockchain getInstance() {
         return instance;
+    }
+
+    private static boolean verifySignature(Message message) {
+        PublicKey publicKey = message.getSender().getPublicKey();
+        List<byte[]> messageData = message.getMessageData();
+        try {
+            Signature sig = Signature.getInstance("SHA1withRSA");
+            sig.initVerify(publicKey);
+            sig.update(messageData.get(0));
+            return sig.verify(messageData.get(1));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    int getMessageId() {
+        return ++messageId;
     }
 
     Block getLatestBlock() {
@@ -68,8 +89,18 @@ class Blockchain {
         return HashUtils.isValidHash(hash, hashPrefix);
     }
 
+    int getUserId() {
+        return ++userId;
+    }
+
     void sendMessage(Message message) {
-        newMessages.add(message);
+        if (
+                message.getId() >= messageId ||
+                        message.getSender().getPublicKey() != message.getPublicKey() ||
+                        verifySignature(message)
+        ) {
+            newMessages.add(message);
+        }
     }
 
     synchronized void submit(long magicNumber, int minerId) {
@@ -98,10 +129,10 @@ class Blockchain {
     }
 
     private void addNewBlock(Block newBlock) {
-        blockCreationTimerStart = Instant.now();
         latestBlock = newBlock;
         prevMessages = newMessages;
         newMessages = new ArrayList<>();
+        blockCreationTimerStart = Instant.now();
         size++;
     }
 
@@ -118,7 +149,6 @@ class Blockchain {
             Block blockToPrint = queue.removeFirst();
             blockToPrint.print();
         }
-        latestBlock.print();
     }
 
     enum DifficultyChange {

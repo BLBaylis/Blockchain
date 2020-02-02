@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.Random;
 
 class RandomIntervalMessageSender extends Thread {
-    private Blockchain blockchain = Blockchain.getInstance();
+    private static Blockchain blockchain = Blockchain.getInstance();
     private static User[] users = {
-            new User("Brad", new KeyGenerator().getKeyPair()),
-            new User("Gill", new KeyGenerator().getKeyPair()),
-            new User("Trev", new KeyGenerator().getKeyPair()),
-            new User("Sam", new KeyGenerator().getKeyPair()),
-            new User("Jazz", new KeyGenerator().getKeyPair())
+            new User(blockchain.getUserId(), "Brad", new KeyGenerator().getKeyPair()),
+            new User(blockchain.getUserId(), "Gill", new KeyGenerator().getKeyPair()),
+            new User(blockchain.getUserId(), "Trev", new KeyGenerator().getKeyPair()),
+            new User(blockchain.getUserId(), "Sam", new KeyGenerator().getKeyPair()),
+            new User(blockchain.getUserId(), "Jazz", new KeyGenerator().getKeyPair())
     };
     private boolean isRunning = true;
 
@@ -19,7 +19,7 @@ class RandomIntervalMessageSender extends Thread {
         Random random = new Random();
         while (isRunning) {
             User user = users[random.nextInt(users.length)];
-            int delay = random.nextInt(5) * 100;
+            int delay = random.nextInt(3) * 100;
             try {
                 Thread.sleep(delay);
                 blockchain.sendMessage(user.createMessage());

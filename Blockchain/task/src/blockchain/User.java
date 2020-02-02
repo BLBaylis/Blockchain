@@ -5,15 +5,15 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 class User {
+    private Blockchain blockchain = Blockchain.getInstance();
     private String name;
-    //private static int userId = 0;
-    //private int id;
+    private long id;
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    User(String name, KeyPair keyPair) {
+    User(long id, String name, KeyPair keyPair) {
         this.name = name;
-        //this.id = ++userId;
+        this.id = id;
         this.privateKey = keyPair.getPrivate();
         this.publicKey = keyPair.getPublic();
     }
@@ -22,9 +22,9 @@ class User {
         return name;
     }
 
-    //int getId() {
-    //return id;
-    //}
+    long getId() {
+        return id;
+    }
 
     PublicKey getPublicKey() {
         return publicKey;
@@ -32,7 +32,7 @@ class User {
 
     Message createMessage() {
         String text = MessageTextGenerator.getRandomMessageText();
-        Message message = new Message(this, text);
+        Message message = new Message(blockchain.getMessageId(), this, text, publicKey);
         message.sign(privateKey);
         return message;
     }
