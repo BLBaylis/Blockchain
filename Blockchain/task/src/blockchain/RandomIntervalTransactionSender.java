@@ -2,12 +2,12 @@ package blockchain;
 
 import java.util.Random;
 
-class RandomIntervalMessageSender implements Runnable {
+class RandomIntervalTransactionSender implements Runnable {
     private static Blockchain blockchain = Blockchain.getInstance();
-    private User sender;
+    private User buyer;
 
-    RandomIntervalMessageSender(User sender) {
-        this.sender = sender;
+    RandomIntervalTransactionSender(User buyer) {
+        this.buyer = buyer;
     }
 
     @Override
@@ -17,7 +17,7 @@ class RandomIntervalMessageSender implements Runnable {
             int delay = random.nextInt(10) * 200;
             try {
                 Thread.sleep(delay);
-                blockchain.sendMessage(sender.createMessage());
+                blockchain.sendTransaction(buyer.createTransaction());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();

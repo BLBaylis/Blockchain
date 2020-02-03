@@ -4,14 +4,16 @@ import java.util.List;
 import java.util.Random;
 
 public class Miner extends Thread {
-    private Blockchain blockchain;
+    //TODO:
+    //   separate thread from miner class
+    //   add coin reward
+    private Blockchain blockchain = Blockchain.getInstance();
     private Block latestBlock;
-    private List<Message> blockData;
-    private int id;
+    private List<Transaction> blockData;
+    private User user;
 
-    Miner(int id) {
-        this.blockchain = Blockchain.getInstance();
-        this.id = id;
+    Miner(User user) {
+        this.user = user;
     }
 
     @Override
@@ -24,13 +26,13 @@ public class Miner extends Thread {
             if (latestBlock != blockchain.getLatestBlock()) {
                 continue;
             }
-            blockchain.submit(magicNumber, id);
+            blockchain.submit(magicNumber, user.getId());
         }
     }
 
     private void refresh() {
         latestBlock = blockchain.getLatestBlock();
-        blockData = blockchain.getPrevMessages();
+        blockData = blockchain.getPrevTransactions();
     }
 
     private long findMagicNumber(long nonce, String hashPrefix) {

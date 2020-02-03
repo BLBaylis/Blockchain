@@ -5,7 +5,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 class User {
-    private Blockchain blockchain = Blockchain.getInstance();
     private String name;
     private long id;
     private PrivateKey privateKey;
@@ -30,10 +29,11 @@ class User {
         return publicKey;
     }
 
-    Message createMessage() {
-        String text = MessageTextGenerator.getRandomMessageText();
-        Message message = new Message(blockchain.getMessageId(), this, text, publicKey);
-        message.sign(privateKey);
-        return message;
+    Transaction createTransaction() {
+        User seller = TransactionGenerator.getRandomUser();
+        int amount = TransactionGenerator.getRandomAmount();
+        Transaction transaction = new Transaction(Blockchain.getTransactionId(), this, seller, amount, publicKey);
+        transaction.sign(privateKey);
+        return transaction;
     }
 }

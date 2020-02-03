@@ -6,10 +6,10 @@ import java.util.List;
 
 class HashUtils {
 
-    static String createBlockHash(long magicNumber, String prevHash, List<Message> messages) {
+    static String createBlockHash(long magicNumber, String prevHash, List<Transaction> messages) {
         String magicNumberStr = Long.toString(magicNumber);
         String messagesStr = messages == null ? "No messages" : messages.stream()
-                .map(Message::toString)
+                .map(Transaction::toString)
                 .reduce("", (concat, curr) -> concat + curr);
         return applySha256(magicNumberStr + prevHash + messagesStr);
     }
