@@ -11,10 +11,10 @@ import java.util.List;
 
 class Blockchain {
     private final static Blockchain instance = new Blockchain();
-    private final long targetGenerationTime = 1000;
     private int messageId = 0;
-    private final int targetBlockchainSize = 5;
     private int userId = 0;
+    private final int targetBlockchainSize = 6;
+    private final long targetGenerationTime = 1000;
     private volatile Block latestBlock;
     private int size;
     private int numOfLeadingZeros = 0;
@@ -42,7 +42,7 @@ class Blockchain {
         }
     }
 
-    int getMessageId() {
+    synchronized int getMessageId() {
         return ++messageId;
     }
 
@@ -89,16 +89,14 @@ class Blockchain {
         return HashUtils.isValidHash(hash, hashPrefix);
     }
 
-    int getUserId() {
+    synchronized int getUserId() {
         return ++userId;
     }
 
     void sendMessage(Message message) {
-        if (
-                message.getId() >= messageId ||
-                        message.getSender().getPublicKey() != message.getPublicKey() ||
-                        verifySignature(message)
-        ) {
+        User sender = message.getSender();
+        if (message.getId() >= messageId || sender.getPublicKey() != message.getPublicKey()
+                || verifySignature(message)) {
             newMessages.add(message);
         }
     }
