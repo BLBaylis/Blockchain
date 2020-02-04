@@ -3,7 +3,6 @@ package blockchain;
 import java.util.Random;
 
 class RandomIntervalTransactionSender implements Runnable {
-    private static Blockchain blockchain = Blockchain.getInstance();
     private User buyer;
 
     RandomIntervalTransactionSender(User buyer) {
@@ -17,7 +16,7 @@ class RandomIntervalTransactionSender implements Runnable {
             int delay = random.nextInt(10) * 200;
             try {
                 Thread.sleep(delay);
-                blockchain.sendTransaction(buyer.createTransaction());
+                buyer.createTransaction();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();

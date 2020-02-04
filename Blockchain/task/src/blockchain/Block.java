@@ -12,14 +12,14 @@ class Block implements Serializable {
     private long magicNumber;
     private long timeStamp;
     private Long generationTime;
-    private long minerId;
+    private User miner;
     private String difficultyChangeMessage;
     private List<Transaction> transactions;
 
     Block(Block prevBlock,
           long magicNumber,
           String hash,
-          long minerId,
+          User miner,
           List<Transaction> transactions,
           long generationTime,
           String difficultyChangeMessage
@@ -29,17 +29,26 @@ class Block implements Serializable {
         id = prevBlock == null ? 1 : prevBlock.id + 1;
         prevHash = prevBlock == null ? "0" : prevBlock.hash;
         this.magicNumber = magicNumber;
-        this.minerId = minerId;
+        this.miner = miner;
         this.transactions = transactions;
         this.hash = hash;
         this.generationTime = generationTime;
         this.difficultyChangeMessage = difficultyChangeMessage;
     }
 
+    List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    User getMiner() {
+        return miner;
+    }
+
     void print() {
         System.out.println();
         System.out.println("Block:");
-        System.out.println("Created by miner # " + minerId);
+        System.out.println("Created by: " + miner.getName());
+        System.out.println(miner.getName() + " gets 100 VC");
         System.out.println("Id: " + id);
         System.out.println("Timestamp: " + timeStamp);
         System.out.println("Magic number: " + magicNumber);

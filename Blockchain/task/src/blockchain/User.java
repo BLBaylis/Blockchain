@@ -3,12 +3,14 @@ package blockchain;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Random;
 
 class User {
     private String name;
     private long id;
     private PrivateKey privateKey;
     private PublicKey publicKey;
+    private Blockchain blockchain = Blockchain.getInstance();
 
     User(long id, String name, KeyPair keyPair) {
         this.name = name;
@@ -29,11 +31,12 @@ class User {
         return publicKey;
     }
 
-    Transaction createTransaction() {
-        User seller = TransactionGenerator.getRandomUser();
-        int amount = TransactionGenerator.getRandomAmount();
+    void createTransaction() {
+        Random random = new Random();
+        User seller = UserDatabase.getUser(random.nextInt(UserDatabase.size()));
+        int amount = random.nextInt(151);
         Transaction transaction = new Transaction(Blockchain.getTransactionId(), this, seller, amount, publicKey);
         transaction.sign(privateKey);
-        return transaction;
+        blockchain.sendTransaction(transaction);
     }
 }

@@ -11,7 +11,6 @@ public class Transaction {
     private User buyer;
     private User seller;
     private int amount;
-    private boolean isSigned = false;
     private PublicKey key;
     private List<byte[]> transactionData;
 
@@ -33,8 +32,16 @@ public class Transaction {
         return buyer;
     }
 
+    User getSeller() {
+        return seller;
+    }
+
     long getId() {
         return id;
+    }
+
+    int getAmount() {
+        return amount;
     }
 
     PublicKey getPublicKey() {
@@ -47,7 +54,6 @@ public class Transaction {
             rsa.initSign(privateKey);
             rsa.update(transactionData.get(0));
             transactionData.add(rsa.sign());
-            isSigned = true;
         } catch (Exception e) {
             System.out.println("Unable to sign transaction");
             e.printStackTrace();
@@ -56,7 +62,7 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return String.format("%s [User Id: %d] sent %d to %s [User Id: %d]",
+        return String.format("%s [User Id: %d] sent %d VC to %s [User Id: %d]",
                 buyer.getName(),
                 buyer.getId(),
                 amount,
